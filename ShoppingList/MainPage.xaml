@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ShoppingList.MainPage">
+
+    <ScrollView>
+        
+        
+        <ListView IsPullToRefreshEnabled="True" >
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextCell Text="{Binding dataValue}">
+                        <TextCell.ContextActions>
+                            <MenuItem Clicked="MenuItem_OnClicked" Text="Delete" IsDestructive="True" CommandParameter="{Binding dataID}"/>
+                        </TextCell.ContextActions>
+                    </TextCell>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </ScrollView>
+
+</ContentPage>
