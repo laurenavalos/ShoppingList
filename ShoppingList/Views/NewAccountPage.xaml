@@ -18,8 +18,8 @@
             <Border Stroke="Gray" StrokeThickness="1" Margin="15, 15, 0, 60">
                 <Entry x:Name="txtEmail" Placeholder="Enter Email Address"/>
             </Border>
-            <Button Text="Create Account" Clicked="CreateAccount_OnClicked" BackgroundColor="Green" TextColor="White" FontAttributes="Bold"/>
             
+            <Button Text="Create Account" Clicked="CreateAccount_OnClicked" BackgroundColor="Green" TextColor="White" FontAttributes="Bold"/>
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>
