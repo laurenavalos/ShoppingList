@@ -19,11 +19,13 @@ public partial class MainPage : ContentPage
         Title = "Shopping List Pro";
         this.Loaded += MainPage_Loaded;
         LP.Unloaded += LP_Unloaded;
-        lstdata.Refreshing += delegate
-        {
-            LoadData();
-            lstdata.IsRefreshing = false;
-        };
+        lstdata.Refreshing += LstdataOnRefreshing;
+    }
+
+    async void LstdataOnRefreshing(object sender, EventArgs e)
+    {   
+        LoadData();
+        lstdata.IsRefreshing = false;
     }
 
     private void LP_Unloaded(object sender, EventArgs e)
