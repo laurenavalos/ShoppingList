@@ -19,10 +19,18 @@ public partial class NewAccountPage : ContentPage
     async void CreateAccount_OnClicked(object sender, EventArgs e)
     {
         //do passwords match
-        
+        if (txtPassword1.Text != txtPassword2.Text)
+        {
+            await DisplayAlert("Error", "Passwords do not match", "OK");
+            return;
+        }
         
         //is email valid
-        
+        if (string.IsNullOrEmpty(txtEmail.Text) || !txtEmail.Text.Contains("@"))
+        {
+            await DisplayAlert("Error", "Please enter a valid email address", "OK");
+            return;
+        }
         
         //api
         var data = JsonConvert.SerializeObject(new userAccount(txtUser.Text, txtPassword1.Text, txtEmail.Text));

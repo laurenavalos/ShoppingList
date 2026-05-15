@@ -12,18 +12,23 @@ namespace ShoppingList.Views;
 public partial class MainPage : ContentPage
 {
     private LoginPage LP = new LoginPage();
-    
+
     public MainPage()
     {
         InitializeComponent();
         Title = "Shopping List Pro";
         this.Loaded += MainPage_Loaded;
         LP.Unloaded += LP_Unloaded;
+        lstdata.Refreshing += delegate
+        {
+            LoadData();
+            lstdata.IsRefreshing = false;
+        };
     }
 
     private void LP_Unloaded(object sender, EventArgs e)
     {
-        OnAppearing1();    
+        OnAppearing1();
     }
 
     private void MainPage_Loaded(object sender, EventArgs e)
@@ -39,20 +44,60 @@ public partial class MainPage : ContentPage
         }
         else
         {
-            txtInput.Text = App.SessionKey;
+            LoadData();
         }
     }
 
     async void Logout_OnClicked(object sender, EventArgs e)
     {
         var data = JsonConvert.SerializeObject(new userAccount(App.SessionKey));
-        
+
         var client = new HttpClient();
-        await client.PostAsync(new Uri("https://joewetzel.com/fvtc/account/login"),
+        await client.PostAsync(new Uri("https://joewetzel.com/fvtc/account/logout"),
             new StringContent(data, Encoding.UTF8, "application/json"));
 
-        
+
         App.SessionKey = "";
         OnAppearing1();
+    }
+
+    async void AddData_OnClicked(object sender, EventArgs e)
+    {
+        var data = JsonConvert.SerializeObject(new userData(null, txtInput.Text, App.SessionKey));
+
+        var client = new HttpClient();
+        var response = await client.PostAsync(new Uri("https://joewetzel.com/fvtc/account/data"),
+            new StringContent(data, Encoding.UTF8, "application/json"));
+
+        txtInput.Text = "";
+
+        LoadData();
+    }
+
+    async void LoadData()
+    {
+        var client = new HttpClient();
+        var response = await client.GetAsync(new Uri("https://joewetzel.com/fvtc/account/data" + App.SessionKey));
+        var wsJson = response.Content.ReadAsStringAsync().Result;
+
+        var UserDataObject = JsonConvert.DeserializeObject<userDataCollection>(wsJson);
+
+        lstdata.ItemsSource = UserDataObject.UserDataItems;
+    }
+
+    async void MenuItem_OnClicked(object sender, EventArgs e)
+    {
+        var dataID = ((MenuItem)sender).CommandParameter.ToString();
+        var data = JsonConvert.SerializeObject(new userData(dataID, null, App.SessionKey));
+
+        var client = new HttpClient();
+        var request = new HttpRequestMessage
+        {
+            Method = HttpMethod.Delete,
+            RequestUri = new Uri("https://joewetzel.com/fvtc/account/data"),
+            Content = new StringContent(data, Encoding.UTF8, "application/json")
+        };
+        await client.SendAsync(request);
+        LoadData();
     }
 }
