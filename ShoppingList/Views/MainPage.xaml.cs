@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ShoppingList.Models;
+using Newtonsoft.Json;
+
 
 namespace ShoppingList.Views;
 
@@ -34,10 +37,21 @@ public partial class MainPage : ContentPage
         {
             Navigation.PushModalAsync(new NavigationPage(LP));
         }
+        else
+        {
+            txtInput.Text = App.SessionKey;
+        }
     }
 
-    private void Logout_OnClicked(object sender, EventArgs e)
+    async void Logout_OnClicked(object sender, EventArgs e)
     {
+        var data = JsonConvert.SerializeObject(new userAccount(App.SessionKey));
+        
+        var client = new HttpClient();
+        await client.PostAsync(new Uri("https://joewetzel.com/fvtc/account/login"),
+            new StringContent(data, Encoding.UTF8, "application/json"));
+
+        
         App.SessionKey = "";
         OnAppearing1();
     }

@@ -18,16 +18,54 @@ public partial class NewAccountPage : ContentPage
 
     async void CreateAccount_OnClicked(object sender, EventArgs e)
     {
+        //do passwords match
+        
+        
+        //is email valid
+        
+        
         //api
         var data = JsonConvert.SerializeObject(new userAccount(txtUser.Text, txtPassword1.Text, txtEmail.Text));
         var client = new HttpClient();
-        var response = await client.PostAsync(new Uri("http://joewetzel.com/fvtc/account/createuser"),
+        var response = await client.PostAsync(new Uri("https://joewetzel.com/fvtc/account/createuser"),
             new StringContent(data, Encoding.UTF8, "application/json"));
         var AccountStatus = response.Content.ReadAsStringAsync().Result;
         
-        AccountStatus = AccountStatus;
         
-        App.SessionKey = "aaa";
-        Navigation.PopModalAsync();
+        //user does exist
+        if(AccountStatus == "user exists")
+        {
+            await DisplayAlert("Error","Sorry this username is already in use", "OK");
+            return;
+        }
+        //is email in use
+        if(AccountStatus == "email exists")
+        {
+            await DisplayAlert("Error","Sorry this email is already in use", "OK");
+            return;
+        }
+        if(AccountStatus == "complete")
+        { 
+            response = await client.PostAsync(new Uri("https://joewetzel.com/fvtc/account/login"),
+                new StringContent(data, Encoding.UTF8, "application/json"));
+            var SKey = response.Content.ReadAsStringAsync().Result;
+            
+            if (!string.IsNullOrEmpty(SKey) && SKey.Length < 50)
+            {
+                App.SessionKey = SKey;
+                await Navigation.PopModalAsync();
+ 
+            }
+            else
+            {
+                await DisplayAlert("Error","Sorry there was an issue logging you in", "OK");
+        
+            }
+        }
+        else
+        {
+            await DisplayAlert("Error","Sorry there was an error creating your account", "OK");
+            return;
+        }
     }
 }
